@@ -34,38 +34,323 @@ A curated, safe list of environment variables is collected to provide context ab
 ## Code Flow and Strategy
 
 ### 1. `sys-manager.js` (System Information)
-The Goal: Find out what's inside the computer 
+# System Information & Environment Variables - Pseudocode
 
-**How it works step-by-step**:
-- **Getting Started**: We import the built in `os` tool.
+## Initialization
 
-- **`getSystemInfo()` Function**:
-  - **Asking Questions**: It asks the computer for basic details like its name and what operating system it uses.
-  - **Checking the CPU**: It finds out what kind of processor you have and how fast it is running.
-  - **Checking the Memory**: It looks at how much RAM you have. Because computers use huge numbers (like millions of bytes), we use a helper tool called `formatBytes` to translate those big numbers into easy words like "MB" or "GB".
+```text
+IMPORT Operating System Module 'os'
 
-- **`getEnvVars()` Function**:
-  - Environment variables are like secret sticky notes the computer leaves around with important settings.
-  - We have a safe list of sticky notes we want to look at (like your `USERNAME`). The function goes through the list and copies them down. If a note is missing, it just writes down "null".
-- **Showing the Results**: If you run this script in your terminal, it gathers all the notes, packages them up neatly (into a format called JSON), and prints them right on your screen!
+START PROGRAM
+```
+---
+
+## Get System Information
+
+```text
+FUNCTION getSystemInfo()
+
+    RETURN
+
+        Operating System Type
+        Platform
+        OS Release Version
+        CPU Architecture
+        Hostname
+        Home Directory
+
+        CPU Model
+        Number of CPU Cores
+        CPU Speed
+
+        Node.js Version
+
+        Total Memory
+        Free Memory
+
+END FUNCTION
+```
+
+---
+
+## Get Environment Variables
+
+```text
+FUNCTION getEnvVars()
+
+    DEFINE list of environment variable names
+
+        PATH
+        USERNAME
+        OS
+        COMPUTERNAME
+        PROCESSOR_ARCHITECTURE
+        NUMBER_OF_PROCESSORS
+        APPDATA
+        TEMP
+        SYSTEMROOT
+        PROGRAMFILES
+        HOME
+        USER
+        SHELL
+        LANG
+        NODE_ENV
+
+    CREATE empty result object
+
+    FOR EACH variable name
+
+        GET value from environment
+
+        IF value exists
+            STORE value
+        ELSE
+            STORE null
+
+    RETURN result
+
+END FUNCTION
+```
+
+---
+
+## Convert Bytes to Human Readable Format
+
+```text
+FUNCTION formatBytes(bytes)
+
+    IF bytes = 0
+        RETURN "0 B"
+
+    DEFINE units:
+        B, KB, MB, GB
+
+    CALCULATE appropriate unit
+
+    CONVERT bytes to readable format
+
+    RETURN formatted value
+
+END FUNCTION
+```
+
+---
+
+## Standalone Terminal Execution
+
+```text
+IF file is executed directly
+
+    CREATE output object
+
+        systemInfo = getSystemInfo()
+        environmentVariables = getEnvVars()
+
+    CONVERT output to formatted JSON
+
+    PRINT JSON to terminal
+
+END IF
+```
+
+---
+
+## Program Flow
+
+```text
+START
+
+Collect System Information
+
+Collect Environment Variables
+
+Format Data as JSON
+
+Display Result in Terminal
+
+END
+```
 
 ### 2. `file-manager.js` (File Operations)
 
-**How it works**:
-- **Setting the Safe Zone**: First, it figures out exactly where our project folder is. That folder becomes our "safe zone".
-- **The Security Guard (`getFilePath`)**:
-  - Before the script touches any file, it checks the file's location.
-  - It makes sure the file is inside our safe zone. If someone tries to access system files outside the project,it stops them and throws an error!
+# File Manager code flow
 
-- **The File Actions (CRUD)**:
-  - **`listFiles` (Read)**: When you want to see what's in a folder, this function takes a look inside. It filters out other folders and only picks the actual files. For each file, it writes down helpful details like its name, how big it is, the exact time it was last modified, and its extension type (like `.txt` or `.js`).
-  - **`createFile` (Create)**: This makes a brand-new file. If you tell it to put the file inside a folder that doesn't exist yet (like `newFolder/myFile.txt`), it's smart enough to build that new folder for you first automatically! However, if you try to create a file that already exists, it stops and warns you so you don't accidentally overwrite your hard work.
-  - **`readFile` (Read)**: This safely opens up a file and reads all the text inside of it. If you ask it to read a file that isn't there, it will throw an error to let you know the file is missing.
-  - **`updateFile` (Update)**: When you want to change what's inside a file, this function deletes the old text and replaces it entirely with the new text you provide. It double-checks that the file actually exists before trying to update it, preventing you from accidentally creating files when you meant to edit them.
-  - **`deleteFile` (Delete)**: This deletes a file. It checks to make sure the file is actually there, and then completely removes it from the project.
-- **Running in the Terminal**: 
-  - When you type a command in your terminal (like `node file-manager.js create hello.txt "Hi!"`), the script listens to your command and safely runs the action.
-  - It has a safety net called `try...catch`. This means if you make a mistake (like trying to read a file that isn't there), the program won't crash. It will just politely print an error message.
+## Initialization
+
+```text
+START
+
+SET PROJECT_DIR = current project folder
+```
+---
+
+## Helper: formatBytes(bytes)
+
+```text
+IF bytes = 0
+    RETURN "0 B"
+
+DEFINE sizes = [B, KB, MB, GB]
+
+CALCULATE index based on byte size
+
+RETURN converted size + unit
+```
+
+---
+
+## Helper: getFilePath(filename)
+
+```text
+JOIN PROJECT_DIR and filename
+
+IF file path is outside PROJECT_DIR
+    THROW error "Access not allowed"
+
+RETURN file path
+```
+
+---
+
+## List Files
+
+```text
+FUNCTION listFiles(subFolder)
+
+    GET target directory path
+
+    IF directory does not exist
+        RETURN empty list
+
+    READ all items in directory
+
+    FOR each item
+
+        GET item information
+
+        IF item is a file
+
+            STORE:
+                file name
+                file size
+                last modified date
+                file extension
+
+    RETURN file list
+```
+
+---
+
+## Create File
+
+```text
+FUNCTION createFile(filename, content)
+
+    GET full file path
+
+    GET parent folder path
+
+    IF parent folder does not exist
+        CREATE folder
+
+    IF file already exists
+        THROW error
+
+    WRITE content into file
+
+    RETURN success message
+```
+
+---
+
+## Read File
+
+```text
+FUNCTION readFile(filename)
+
+    GET full file path
+
+    IF file does not exist
+        THROW error
+
+    READ file content
+
+    RETURN filename and content
+```
+
+---
+
+## Update File
+
+```text
+FUNCTION updateFile(filename, content)
+
+    GET full file path
+
+    IF file does not exist
+        THROW error
+
+    OVERWRITE file with new content
+
+    RETURN success message
+```
+
+---
+
+## Delete File
+
+```text
+FUNCTION deleteFile(filename)
+
+    GET full file path
+
+    IF file does not exist
+        THROW error
+
+    DELETE file
+
+    RETURN success message
+```
+
+---
+
+## Command Line Interface
+
+```text
+IF file is run directly
+
+    TRY
+
+        IF command = "list"
+            CALL listFiles()
+
+        ELSE IF command = "create"
+            CALL createFile()
+
+        ELSE IF command = "read"
+            CALL readFile()
+
+        ELSE IF command = "update"
+            CALL updateFile()
+
+        ELSE IF command = "delete"
+            CALL deleteFile()
+
+        ELSE
+            RETURN error "Unknown command"
+
+        PRINT result as formatted JSON
+
+    CATCH any error
+
+        PRINT error as JSON
+
+END
+```
+
+
+
+
 
 
 ## JSON Output in Terminal for sys-manager.js
